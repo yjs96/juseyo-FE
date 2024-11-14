@@ -1,0 +1,14 @@
+#root {
+  position: relative;
+  margin: 0 auto;
+  width: 100dvw;
+  height: 100dvh;
+  min-width: 296px;
+  max-width: 600px;
+  min-height: 500px;
+  background-color: var(--white);
+  /* padding-top: env(safe-area-inset-top); */
+  font-weight: 400;
+  color: var(--black);
+  /* border: 1px black solid; */
+}
