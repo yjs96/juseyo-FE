@@ -10,7 +10,7 @@ const ProgressQuiz = React.forwardRef<
   <ProgressPrimitive.Root
     ref={ref}
     className={cn(
-      'relative h-2.5 w-full overflow-hidden rounded-none bg-[var(--gray)]',
+      'relative h-2.5 w-full overflow-hidden rounded-none bg-[var(--background)]',
       className
     )}
     {...props}
