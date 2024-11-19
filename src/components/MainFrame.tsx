@@ -5,6 +5,7 @@ interface MainFrameProps {
   $headbar?: boolean;
   $navbar?: boolean;
   $padded?: boolean;
+  $bgGray?: boolean;
   children?: React.ReactNode;
 }
 
@@ -12,17 +13,24 @@ export default function MainFrame({
   $headbar,
   $navbar,
   $padded,
+  $bgGray,
   children,
 }: MainFrameProps) {
   return (
-    <StyledMainFrame $headbar={$headbar} $navbar={$navbar} $padded={$padded}>
+    <StyledMainFrame
+      $headbar={$headbar}
+      $navbar={$navbar}
+      $padded={$padded}
+      $bgGray={$bgGray}
+    >
       {children}
     </StyledMainFrame>
   );
 }
 
 const StyledMainFrame = styled.div<MainFrameProps>`
-  background-color: var(--white);
+  background-color: ${(props) =>
+    props.$bgGray ? 'var(--background)' : 'var(--white)'};
   position: relative;
   width: 100%;
   height: ${(props) => {
