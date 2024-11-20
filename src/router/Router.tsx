@@ -11,7 +11,9 @@ import QuizResult from '@/pages/edu/QuizResult';
 import SignUp from '@/pages/login/SignUp';
 import SignUpSuccess from '@/pages/login/SignUpSuccess';
 import LoginPage from '@/pages/login/LoginPage';
+import RedirectPage from '@/pages/login/RedirectPage';
 import MissionParents from '@/pages/mission/MissionParents';
+
 
 function ThemeColorManager() {
   const location = useLocation();
@@ -47,6 +49,7 @@ export default function Router() {
         <Route path="/signup" element={<SignUp />}></Route>
         <Route path="/signup/:id" element={<SignUp />}></Route>
         <Route path="/signup/success" element={<SignUpSuccess />}></Route>
+        <Route path="/redirect" element={<RedirectPage />}></Route>
       </Routes>
     </BrowserRouter>
   );

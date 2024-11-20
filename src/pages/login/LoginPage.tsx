@@ -1,6 +1,14 @@
 import styled from 'styled-components';
 
 export default function LoginPage() {
+  const kakaoLoginRequestCodeHandler = async () => {
+    window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${
+      import.meta.env.VITE_KAKAO_REST_API_KEY
+    }&redirect_uri=${
+      import.meta.env.VITE_FRONT_BASE
+    }/redirect&response_type=code`;
+  };
+
   return (
     <>
       <MainFrame>
@@ -13,7 +21,7 @@ export default function LoginPage() {
             <span>작은 미션으로 시작하는 우리 아이 경제교육</span>
           </DescFrame>
           <ButtonFrame>
-            <KakaoButton>
+            <KakaoButton onClick={kakaoLoginRequestCodeHandler}>
               카카오 로그인
               <img src="/images/kakao-logo.png" alt="" />
             </KakaoButton>
