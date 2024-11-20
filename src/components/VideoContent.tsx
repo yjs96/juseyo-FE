@@ -42,16 +42,16 @@ export default function VideoContent({
   return (
     <>
       <ContentFrame>
-        <InfoFrame>
+        <InfoFrame className="info-frame">
           <Thumbnail>
             <img src={img} alt="edvideo" />
           </Thumbnail>
           <Description>
-            <div>{title}</div>
+            <div className="truncate">{title}</div>
             <span>{description}</span>
           </Description>
         </InfoFrame>
-        <ButtonFrame>
+        <ButtonFrame className="button-frame">
           <Button onClick={() => handleWatchVideo(videoUrl)}>보러가기</Button>
           <Button onClick={() => navigate(`/edu/${index}`)}>퀴즈풀기</Button>
         </ButtonFrame>

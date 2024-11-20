@@ -34,9 +34,7 @@ export default function QuizResult() {
             </XIcon>
           )}
         </ResultIconFrame>
-        <ScoreDisplay>
-          점수: {score} / {answers.length}
-        </ScoreDisplay>
+        <ScoreDisplay>{(score / answers.length) * 100}점</ScoreDisplay>
         <ResultMessage>
           {isPassed ? '통과했어요! 👏' : '다시 한번 도전해보세요! 💪'}
         </ResultMessage>

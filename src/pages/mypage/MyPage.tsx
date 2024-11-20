@@ -26,17 +26,17 @@ export default function MyPage() {
   };
 
   const userName = '임준수';
-  const userId = 1;
+  const userId = 'yimj57027@gmail.com';
 
   const kakaoSend = {
     userName: userName,
-    userId: userId,
-    type: 'child',
+    parentId: userId,
   };
 
   const newStr: string = JSON.stringify(kakaoSend);
   const encodedInfo = btoa(encodeURIComponent(newStr));
   // decodeURIComponent(atob(인코딩된문자열))로 가입링크 받기
+  console.log(encodedInfo);
 
   const shareKakao = () => {
     window.Kakao.Share.sendDefault({

@@ -8,6 +8,9 @@ import MyPage from '@/pages/mypage/MyPage';
 
 import EduQuiz from '@/pages/edu/EduQuiz';
 import QuizResult from '@/pages/edu/QuizResult';
+import SignUp from '@/pages/login/SignUp';
+import SignUpSuccess from '@/pages/login/SignUpSuccess';
+import LoginPage from '@/pages/login/LoginPage';
 
 function ThemeColorManager() {
   const location = useLocation();
@@ -38,6 +41,10 @@ export default function Router() {
         <Route path="/edu/:id" element={<EduQuiz />}></Route>
         <Route path="/edu/result" element={<QuizResult />}></Route>
         <Route path="/mypage" element={<MyPage />}></Route>
+        <Route path="/login" element={<LoginPage />}></Route>
+        <Route path="/signup" element={<SignUp />}></Route>
+        <Route path="/signup/:id" element={<SignUp />}></Route>
+        <Route path="/signup/success" element={<SignUpSuccess />}></Route>
       </Routes>
     </BrowserRouter>
   );

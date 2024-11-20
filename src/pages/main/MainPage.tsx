@@ -6,14 +6,16 @@ import SectionHeader from '@/components/SectionHeader';
 import styled from 'styled-components';
 import MissionCard from '@/components/MissionCard';
 import VideoContent from '@/components/VideoContent';
+import { useNavigate } from 'react-router-dom';
 
 export default function MainPage() {
+  const navigate = useNavigate();
   const videoInfo = {
     index: 1,
-    img: '/images/eduvideoimg.jpg',
-    title: '초등돌봄교실 [EP.1]',
+    img: '/images/quiz/1.jpg',
+    title: '신나는 신용생활 [EP.1]',
     description:
-      'KB국민카드 2024 초등돌봄교실 금융교육 신나는 신용생활 - [EP.1] 신용이 중요해 KB국민카드 2024 초등돌봄교실 금융교육',
+      '신용의 원리와 중요성에 대해 이해하고 어떻게 하면 신용을 쌓을 수 있을지 알아보도록 해요.🔎',
     videoUrl: 'https://www.youtube.com/watch?v=md1-qbKR_eI',
   };
   return (
@@ -27,6 +29,8 @@ export default function MainPage() {
         successfulMisson={2}
       />
       <BottomHalf>
+        <div onClick={() => navigate('/signup')}>회원가입</div>
+        <div onClick={() => navigate('/login')}>로그인</div>
         <Section>
           <SectionHeader title="진행 중인 미션" path="/mission" />
           <CardContainer>
