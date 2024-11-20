@@ -4,7 +4,7 @@ interface MissionCardProps {
   title: string;
   category: string;
   amount: number;
-  daedline: string;
+  deadline: string;
 }
 
 interface CategoryInfo {
@@ -16,7 +16,7 @@ const MissionCard = ({
   title,
   category,
   amount,
-  daedline,
+  deadline
 }: MissionCardProps) => {
   const getTimeRemaining = (deadline: string) => {
     const now = new Date();
@@ -45,7 +45,7 @@ const MissionCard = ({
         </CategoryBadge>
         <TextContainer>
           <h1>{title}</h1>
-          <p>{getTimeRemaining(daedline)}</p>
+          <p>{getTimeRemaining(deadline)}</p>
         </TextContainer>
       </TopContainer>
       <BottomContainer>
@@ -61,17 +61,19 @@ export default MissionCard;
 const getCategoryInfo = (category: string): CategoryInfo => {
   switch (category) {
     case '일상':
-      return { color: 'var(--primary)', src: '/images/daily.png' };
+      return { color: 'var(--primary)', src: '/icons/daily.svg' };
     case '학습':
-      return { color: 'var(--blue)', src: '/images/study.png' };
+      return { color: 'var(--blue)', src: '/icons/study.svg' };
     case '집안일':
-      return { color: 'var(--green)', src: '/images/housework.png' };
+      return { color: 'var(--green)', src: '/icons/housework.svg' };
+    case '자기관리':
+      return { color: '#f593ba', src: '/icons/management.svg' };
     case '심부름':
-      return { color: 'var(--gray)', src: '/images/errand.png' };
+      return { color: 'var(--gray)', src: '/icons/errand.svg' };
     case '기타':
-      return { color: 'var(--orange)', src: '/images/etc.png' };
+      return { color: 'var(--orange)', src: '/icons/etc.svg' };
   }
-  return { color: 'var(--primary)', src: '/images/daily.png' };
+  return { color: 'var(--primary)', src: '/icons/daily.svg' };
 };
 
 const Container = styled.div<{ color: string }>`

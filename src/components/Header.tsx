@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import AddMission from './AddMission';
 
 interface HeaderProps {
   title: string;
@@ -8,10 +9,16 @@ interface HeaderProps {
 
 const Header = ({ title, iconSrc, alt }: HeaderProps) => {
   return (
-    <HeaderContainer>
-      <h1>{title}</h1>
-      <img src={iconSrc} alt={alt} />
-    </HeaderContainer>
+    <>
+      <HeaderContainer>
+        <h1>{title}</h1>
+        {alt === '추가' ? (
+          <AddMission iconSrc={iconSrc} alt={alt} />
+        ) : (
+          <img src={iconSrc} alt={alt} />
+        )}
+      </HeaderContainer>
+    </>
   );
 };
 
@@ -25,7 +32,7 @@ const HeaderContainer = styled.div`
   justify-content: space-between;
   background-color: var(--white);
   position: fixed;
-  z-index: 1000;
+  z-index: 3;
 
   h1 {
     font-size: 22px;

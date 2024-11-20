@@ -1,20 +1,24 @@
-import { useState } from 'react';
 import styled from 'styled-components';
 
-const TabBar = () => {
-  const [activeTab, setActiveTab] = useState(0);
+interface TabBarProps {
+  activeTab: number;
+  setActiveTab: (index: number) => void;
+}
+
+const TabBar = ({ activeTab, setActiveTab }: TabBarProps) => {
+  const tabs = ['진행중', '완료', '요청됨'];
 
   return (
     <Container>
-      <Tab $isActive={activeTab === 0} onClick={() => setActiveTab(0)}>
-        진행중
-      </Tab>
-      <Tab $isActive={activeTab === 1} onClick={() => setActiveTab(1)}>
-        완료
-      </Tab>
-      <Tab $isActive={activeTab === 2} onClick={() => setActiveTab(2)}>
-        요청됨
-      </Tab>
+      {tabs.map((tab, index) => (
+        <Tab
+          key={index}
+          $isActive={activeTab === index}
+          onClick={() => setActiveTab(index)}
+        >
+          {tab}
+        </Tab>
+      ))}
     </Container>
   );
 };
@@ -26,6 +30,7 @@ const Container = styled.div`
   max-width: 600px;
   margin-top: 65px;
   position: fixed;
+  z-index: 50;
   display: flex;
 `;
 
