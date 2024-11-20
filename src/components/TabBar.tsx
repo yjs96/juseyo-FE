@@ -1,13 +1,12 @@
 import styled from 'styled-components';
 
 interface TabBarProps {
+  tabs: Array<string>;
   activeTab: number;
   setActiveTab: (index: number) => void;
 }
 
-const TabBar = ({ activeTab, setActiveTab }: TabBarProps) => {
-  const tabs = ['진행중', '완료', '요청됨'];
-
+const TabBar = ({ tabs, activeTab, setActiveTab }: TabBarProps) => {
   return (
     <Container>
       {tabs.map((tab, index) => (

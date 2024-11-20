@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
 import MainPage from '@/pages/main/MainPage';
-import MissionMain from '@/pages/mission/MissionMain';
+import MissionChild from '@/pages/mission/MissionChild';
 import EduMain from '@/pages/edu/EduMain';
 import MyPage from '@/pages/mypage/MyPage';
 
@@ -11,6 +11,7 @@ import QuizResult from '@/pages/edu/QuizResult';
 import SignUp from '@/pages/login/SignUp';
 import SignUpSuccess from '@/pages/login/SignUpSuccess';
 import LoginPage from '@/pages/login/LoginPage';
+import MissionParents from '@/pages/mission/MissionParents';
 
 function ThemeColorManager() {
   const location = useLocation();
@@ -36,7 +37,8 @@ export default function Router() {
       <ThemeColorManager />
       <Routes>
         <Route path="/" element={<MainPage />}></Route>
-        <Route path="/mission" element={<MissionMain />}></Route>
+        <Route path="/mission/child" element={<MissionChild />}></Route>
+        <Route path="/mission/parents" element={<MissionParents />}></Route>
         <Route path="/edu" element={<EduMain />}></Route>
         <Route path="/edu/:id" element={<EduQuiz />}></Route>
         <Route path="/edu/result" element={<QuizResult />}></Route>

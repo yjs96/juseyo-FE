@@ -15,23 +15,23 @@ function NavBar() {
     {
       path: '/',
       name: '홈',
-      icon: 'fa-solid fa-house',
+      icon: 'fa-solid fa-house'
     },
     {
-      path: '/mission',
+      path: '/mission/child',
       name: '미션',
-      icon: 'fa-solid fa-rectangle-list',
+      icon: 'fa-solid fa-rectangle-list'
     },
     {
       path: '/edu',
       name: '교육',
-      icon: 'fa-solid fa-pen',
+      icon: 'fa-solid fa-pen'
     },
     {
       path: '/mypage',
       name: '마이페이지',
-      icon: 'fa-solid fa-user',
-    },
+      icon: 'fa-solid fa-user'
+    }
   ];
 
   const isActive = (path: string) => {

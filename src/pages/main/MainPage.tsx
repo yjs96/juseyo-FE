@@ -32,7 +32,7 @@ export default function MainPage() {
         <div onClick={() => navigate('/signup')}>회원가입</div>
         <div onClick={() => navigate('/login')}>로그인</div>
         <Section>
-          <SectionHeader title="진행 중인 미션" path="/mission" />
+          <SectionHeader title="진행 중인 미션" path="/mission/child" />
           <CardContainer>
             <MissionCard
               title="~~사오기"
@@ -49,7 +49,10 @@ export default function MainPage() {
           </CardContainer>
         </Section>
         <Section>
-          <SectionHeader title="최근 완료한 미션" path="/mission" />
+          <SectionHeader
+            title="최근 완료한 미션"
+            path="/mission/child?tab=completed"
+          />
           <CardContainer>
             <MissionCard
               title="~~사오기"

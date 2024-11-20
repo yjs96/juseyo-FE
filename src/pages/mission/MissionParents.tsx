@@ -1,7 +1,7 @@
 // import React from 'react';
-import CategoryButton from '@/components/CategoryButton';
+import CompletedMissionCard from '@/components/CompletedMissionCard';
 import Header from '@/components/Header';
-import MissionCard from '@/components/MissionCard';
+import MissionActionCard from '@/components/MissionActionCard';
 import NavBar from '@/components/NavBar';
 import TabBar from '@/components/TabBar';
 import {
@@ -14,22 +14,16 @@ import {
 import { useState } from 'react';
 import styled from 'styled-components';
 
-export default function MissionMain() {
-  const category = [
-    '전체',
-    '일상',
-    '집안일',
-    '학습',
-    '자기관리',
-    '심부름',
-    '기타'
-  ];
+const MissionParents = () => {
+  const tabs = ['요청받은 미션', '진행중인 미션', '완료된 미션'];
+  const responseButtons = ['거절', '수락'];
+  const resultButtons = ['실패', '성공'];
+
   const currentMonth = getCurrentMonth();
   const previousMonths = getPreviousMonths();
 
   const [activeTab, setActiveTab] = useState<number>(0);
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
-  const [selectedCategory, setSelectedCategory] = useState<string>('전체');
 
   const getOngoingMissions = () => {
     const now = new Date();
@@ -44,37 +38,24 @@ export default function MissionMain() {
   return (
     <>
       <NavBar />
-      <Header title="용돈 미션" iconSrc="/icons/plus.svg" alt="추가" />
-      <TabBar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Header title="미션" iconSrc="/icons/plus.svg" alt="추가" />
+      <TabBar tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {activeTab === 0 && (
         <>
-          <CategorySection $activeTab={activeTab}>
-            {category.map((item, index) => (
-              <CategoryButton
-                key={index}
-                category={item}
-                isSelected={selectedCategory === item}
-                onClick={() => setSelectedCategory(item)}
-              />
-            ))}
-          </CategorySection>
-          <MissionSection>
-            {getOngoingMissions()
-              .filter((mission) =>
-                selectedCategory === '전체'
-                  ? true
-                  : mission.category === selectedCategory
-              )
-              .map(({ title, category, deadline, amount }, index) => (
-                <MissionCard
+          <MissionSection $activeTab={activeTab}>
+            {getOngoingMissions().map(
+              ({ title, category, deadline, amount }, index) => (
+                <MissionActionCard
                   key={index}
                   title={title}
                   category={category}
                   deadline={deadline}
                   amount={amount}
+                  buttons={responseButtons}
                 />
-              ))}
+              )
+            )}
           </MissionSection>
         </>
       )}
@@ -100,19 +81,20 @@ export default function MissionMain() {
               </SelectContent>
             </Select>
           </CategorySection>
-          <MissionSection>
-            {getCompletedMissions()
+          <MissionSection $activeTab={activeTab}>
+            {getOngoingMissions()
               .filter((mission) => {
                 const missionMonth = mission.deadline.slice(5, 7);
                 return missionMonth === selectedMonth;
               })
               .map(({ title, category, deadline, amount }, index) => (
-                <MissionCard
+                <MissionActionCard
                   key={index}
                   title={title}
                   category={category}
                   deadline={deadline}
                   amount={amount}
+                  buttons={resultButtons}
                 />
               ))}
           </MissionSection>
@@ -122,27 +104,48 @@ export default function MissionMain() {
       {activeTab === 2 && (
         <>
           <CategorySection $activeTab={activeTab}>
-            <Text>수락 대기중인 미션</Text>
+            <Text>2024년</Text>
+            <Select
+              defaultValue={currentMonth}
+              onValueChange={setSelectedMonth}
+            >
+              <SelectTrigger className="w-[70px]">
+                <SelectValue></SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {previousMonths.map((month) => (
+                  <SelectItem key={month} value={month}>
+                    {month}월
+                  </SelectItem>
+                ))}
+                <SelectItem value={currentMonth}>{currentMonth}월</SelectItem>
+              </SelectContent>
+            </Select>
           </CategorySection>
-          <MissionSection>
-            <MissionCard
-              title="~~사오기"
-              category="일상"
-              deadline="2024-11-18 10:00:00"
-              amount={1200}
-            ></MissionCard>
-            <MissionCard
-              title="설거지하기"
-              category="집안일"
-              deadline="2024-11-16 10:00:00"
-              amount={1200}
-            ></MissionCard>
+          <MissionSection $activeTab={activeTab}>
+            {getCompletedMissions()
+              .filter((mission) => {
+                const missionMonth = mission.deadline.slice(5, 7);
+                return missionMonth === selectedMonth;
+              })
+              .map(({ title, category, deadline, amount }, index) => (
+                <CompletedMissionCard
+                  key={index}
+                  title={title}
+                  category={category}
+                  deadline={deadline}
+                  amount={amount}
+                  isCompleted={true}
+                />
+              ))}
           </MissionSection>
         </>
       )}
     </>
   );
-}
+};
+
+export default MissionParents;
 
 const getCurrentMonth = () => {
   const now = new Date();
@@ -235,20 +238,21 @@ const CategorySection = styled.div<{ $activeTab: number }>`
   margin-top: 103px;
   width: 100%;
   max-width: 600px;
-  padding: ${({ $activeTab }) => ($activeTab === 1 ? '8px 20px' : '16px 20px')};
+  padding: ${({ $activeTab }) => ($activeTab !== 0 ? '8px 20px' : '16px 20px')};
   overflow-x: auto;
   white-space: nowrap;
   gap: 8px;
   display: flex;
-  justify-content: space-between;
+  justify-content: ${({ $activeTab }) =>
+    $activeTab === 0 ? '' : 'space-between'};
   align-items: center;
   background-color: var(--white);
   position: fixed;
   z-index: 50;
 `;
 
-const MissionSection = styled.div`
-  margin-top: 160.33px;
+const MissionSection = styled.div<{ $activeTab: number }>`
+  margin-top: ${({ $activeTab }) => ($activeTab === 0 ? '120px' : '160.33px')};
   padding: 0 20px 90px 20px;
   display: flex;
   flex-wrap: wrap;
