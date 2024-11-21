@@ -6,7 +6,7 @@ import {
   DrawerDescription,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
+  DrawerTrigger
 } from './ui/drawer';
 import DrawerCategoryCard from './DrawerCategoryCard';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -16,7 +16,9 @@ import { Calendar } from './ui/calendar';
 import { CalendarIcon } from 'lucide-react';
 import { Input } from './ui/input';
 import { postRequestMission } from '@/api/requestMission';
-// import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { useSetRecoilState } from 'recoil';
+import { isMissionRequestedState } from '@/store/mission';
 
 interface AddMissionProps {
   iconSrc: string;
@@ -24,8 +26,6 @@ interface AddMissionProps {
 }
 
 const AddMission = ({ iconSrc, alt }: AddMissionProps) => {
-  // const navigate = useNavigate();
-
   const category = ['일상', '집안일', '학습', '자기관리', '심부름', '기타'];
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -34,6 +34,7 @@ const AddMission = ({ iconSrc, alt }: AddMissionProps) => {
   const [missionContent, setMissionContent] = useState<string>('');
   const [missionPoint, setMissionPoint] = useState<number | ''>('');
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const setIsMissionRequested = useSetRecoilState(isMissionRequestedState);
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
@@ -41,20 +42,23 @@ const AddMission = ({ iconSrc, alt }: AddMissionProps) => {
 
   const handleSubmit = async () => {
     const requestData = {
-      startDate: startDate ? format(startDate, 'yyyy-MM-dd') : '',
       endDate: endDate ? format(endDate, 'yyyy-MM-dd') : '',
       content: missionContent,
       category: selectedCategory,
-      point: missionPoint,
+      point: missionPoint
     };
 
-    const res = await postRequestMission(requestData);
+    try {
+      await postRequestMission(requestData);
 
-    if (!(res.status == 200)) {
-      throw new Error(`미션 요청 실패`);
+      toast.success('미션 요청 성공');
+
+      setIsMissionRequested(true);
+      setIsDrawerOpen(false);
+    } catch (error) {
+      toast.error('미션 요청 실패');
+      throw new Error(`handleSubmit Error: ${error}`);
     }
-    alert('미션 요청 성공');
-    setIsDrawerOpen(false);
   };
 
   const isFormValid = () => {

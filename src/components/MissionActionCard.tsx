@@ -1,6 +1,20 @@
 import styled from 'styled-components';
 
+import {
+  getProgressMissionComplete,
+  getProgressMissionFail,
+  getRequestMissionApprove,
+  getRequestMissionReject
+} from '@/api/requestMission';
+import toast from 'react-hot-toast';
+import {
+  progressMissionUpdateTriggerState,
+  requestMissionUpdateTriggerState
+} from '@/store/mission';
+import { useSetRecoilState } from 'recoil';
+
 interface MissionActionCardProps {
+  id: number;
   content: string;
   category: string;
   point: number;
@@ -14,12 +28,20 @@ interface CategoryInfo {
 }
 
 const MissionActionCard = ({
+  id,
   content,
   category,
   point,
   endDate,
   buttons
 }: MissionActionCardProps) => {
+  const setRequestMissionUpdateTrigger = useSetRecoilState(
+    requestMissionUpdateTriggerState
+  );
+  const setprogressMissionUpdateTrigger = useSetRecoilState(
+    progressMissionUpdateTriggerState
+  );
+
   const getTimeRemaining = (endDate: string) => {
     const now = new Date();
     const deadlineDate = new Date(endDate);
@@ -37,6 +59,51 @@ const MissionActionCard = ({
   };
 
   const { color, src } = getCategoryInfo(category);
+
+  // 요청 받은 미션
+  const rejectMission = async () => {
+    try {
+      await getRequestMissionReject(id);
+      setRequestMissionUpdateTrigger('reject');
+      toast.success('미션을 거절했어요');
+    } catch (error) {
+      toast.error('미션 거절 실패');
+      throw new Error(`rejectMission Error: ${error}`);
+    }
+  };
+
+  const approveMission = async () => {
+    try {
+      await getRequestMissionApprove(id);
+      setRequestMissionUpdateTrigger('approve');
+      toast.success('미션을 수락했어요!');
+    } catch (error) {
+      toast.error('미션 수락 실패');
+      throw new Error(`approveMission Error: ${error}`);
+    }
+  };
+
+  // 진행중인 미션
+  const missionFail = async () => {
+    try {
+      await getProgressMissionFail(id);
+      setprogressMissionUpdateTrigger('fail');
+      toast.success('미션이 실패로 기록되었습니다');
+    } catch (error) {
+      toast.error('미션 실패 요청 실패');
+      throw new Error(`missionFail Error: ${error}`);
+    }
+  };
+  const missionComplete = async () => {
+    try {
+      await getProgressMissionComplete(id);
+      setprogressMissionUpdateTrigger('complete');
+      toast.success('미션이 성공으로 기록되었습니다!');
+    } catch (error) {
+      toast.error('미션 성공 요청 실패');
+      throw new Error(`approveMission Error: ${error}`);
+    }
+  };
 
   return (
     <Container>
@@ -57,8 +124,18 @@ const MissionActionCard = ({
         </BottomContainer>
       </MissionContainer>
       <ButtonFrame>
-        <Button className="text-[var(--red)]">{buttons[0]}</Button>
-        <Button className="text-[var(--black)]">{buttons[1]}</Button>
+        <Button
+          className="text-[var(--red)]"
+          onClick={buttons[0] === '거절' ? rejectMission : missionFail}
+        >
+          {buttons[0]}
+        </Button>
+        <Button
+          className="text-[var(--black)]"
+          onClick={buttons[1] === '수락' ? approveMission : missionComplete}
+        >
+          {buttons[1]}
+        </Button>
       </ButtonFrame>
     </Container>
   );

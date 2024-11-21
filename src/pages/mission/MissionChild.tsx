@@ -3,15 +3,15 @@ import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
   completeMissionState,
   failMissionState,
+  isMissionRequestedState,
   progressMissionState,
   requestMissionState
 } from '@/store/mission';
 
-import { login } from '@/api/auth';
 import {
   getCompleteMission,
   getFailMission,
@@ -72,6 +72,8 @@ export default function MissionChild() {
   const [failMission, setFailMission] = useRecoilState(failMissionState);
   const [requestMission, setRequestMission] =
     useRecoilState(requestMissionState);
+  const isMissionRequested = useRecoilValue(isMissionRequestedState);
+  const setIsMissionRequested = useSetRecoilState(isMissionRequestedState);
 
   const finishedMissions = () => {
     const combinedMissions = [
@@ -100,16 +102,6 @@ export default function MissionChild() {
     if (tabParam === 'completed') {
       setActiveTab(1);
     }
-
-    const fetchData = async () => {
-      try {
-        const res = await login('admin_child', 'admin');
-        // console.log(res.data); // 응답 데이터 처리
-        localStorage.setItem('accessToken', res.accessToken);
-      } catch (error) {
-        console.error('Error during login:', error);
-      }
-    };
 
     const fetchProgressMission = async () => {
       try {
@@ -151,7 +143,11 @@ export default function MissionChild() {
       }
     };
 
-    fetchData();
+    if (isMissionRequested) {
+      fetchRequestMission();
+      setIsMissionRequested(false);
+    }
+
     fetchRequestMission();
     fetchFailMission();
     fetchCompleteMission();
@@ -161,7 +157,9 @@ export default function MissionChild() {
     setCompleteMission,
     setFailMission,
     setProgreesMission,
-    setRequestMission
+    setRequestMission,
+    isMissionRequested,
+    setIsMissionRequested
   ]);
 
   return (

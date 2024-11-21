@@ -13,19 +13,21 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { login } from '@/api/auth';
+
 import {
   getCompleteMission,
   getFailMission,
   getProgressMission,
   getRequestMission
 } from '@/api/mission';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
   completeMissionState,
   failMissionState,
   progressMissionState,
-  requestMissionState
+  progressMissionUpdateTriggerState,
+  requestMissionState,
+  requestMissionUpdateTriggerState
 } from '@/store/mission';
 import CategoryButton from '@/components/CategoryButton';
 
@@ -71,6 +73,20 @@ const MissionParents = () => {
     useRecoilState(completeMissionState);
   const [failMission, setFailMission] = useRecoilState(failMissionState);
 
+  const progressMissionUpdateTrigger = useRecoilValue(
+    progressMissionUpdateTriggerState
+  );
+  const setprogressMissionUpdateTrigger = useSetRecoilState(
+    progressMissionUpdateTriggerState
+  );
+
+  const requestMissionUpdateTrigger = useRecoilValue(
+    requestMissionUpdateTriggerState
+  );
+  const setrequestMissionUpdateTrigger = useSetRecoilState(
+    requestMissionUpdateTriggerState
+  );
+
   const finishedMissions = () => {
     const combinedMissions = [
       ...completeMission.map((mission) => ({
@@ -92,16 +108,6 @@ const MissionParents = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await login('admin_child', 'admin');
-        // console.log(res.data); // 응답 데이터 처리
-        localStorage.setItem('accessToken', res.accessToken);
-      } catch (error) {
-        console.error('Error during login:', error);
-      }
-    };
-
     const fetchRequestMission = async () => {
       try {
         const res = await getRequestMission();
@@ -142,7 +148,29 @@ const MissionParents = () => {
       }
     };
 
-    fetchData();
+    if (requestMissionUpdateTrigger === 'reject') {
+      fetchRequestMission();
+      setrequestMissionUpdateTrigger('');
+    }
+
+    if (requestMissionUpdateTrigger === 'approve') {
+      fetchRequestMission();
+      fetchProgressMission();
+      setrequestMissionUpdateTrigger('');
+    }
+
+    if (progressMissionUpdateTrigger === 'fail') {
+      fetchProgressMission();
+      fetchFailMission();
+      setprogressMissionUpdateTrigger('');
+    }
+
+    if (progressMissionUpdateTrigger === 'complete') {
+      fetchProgressMission();
+      fetchCompleteMission();
+      setprogressMissionUpdateTrigger('');
+    }
+
     fetchRequestMission();
     fetchFailMission();
     fetchCompleteMission();
@@ -151,7 +179,11 @@ const MissionParents = () => {
     setCompleteMission,
     setFailMission,
     setProgreesMission,
-    setRequestMission
+    setRequestMission,
+    progressMissionUpdateTrigger,
+    setprogressMissionUpdateTrigger,
+    requestMissionUpdateTrigger,
+    setrequestMissionUpdateTrigger
   ]);
 
   return (
