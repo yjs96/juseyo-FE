@@ -6,7 +6,7 @@ import {
   DrawerDescription,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger
+  DrawerTrigger,
 } from './ui/drawer';
 import DrawerCategoryCard from './DrawerCategoryCard';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -16,7 +16,7 @@ import { Calendar } from './ui/calendar';
 import { CalendarIcon } from 'lucide-react';
 import { Input } from './ui/input';
 import { postRequestMission } from '@/api/requestMission';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 interface AddMissionProps {
   iconSrc: string;
@@ -24,7 +24,7 @@ interface AddMissionProps {
 }
 
 const AddMission = ({ iconSrc, alt }: AddMissionProps) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const category = ['일상', '집안일', '학습', '자기관리', '심부름', '기타'];
 
@@ -39,21 +39,21 @@ const AddMission = ({ iconSrc, alt }: AddMissionProps) => {
     setSelectedCategory(category);
   };
 
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
     const requestData = {
       startDate: startDate ? format(startDate, 'yyyy-MM-dd') : '',
       endDate: endDate ? format(endDate, 'yyyy-MM-dd') : '',
       content: missionContent,
       category: selectedCategory,
-      point: missionPoint
+      point: missionPoint,
     };
 
     const res = await postRequestMission(requestData);
 
-    if(!(res.status==200)){
-      throw new Error(`미션 요청 실패`)
+    if (!(res.status == 200)) {
+      throw new Error(`미션 요청 실패`);
     }
-    alert("미션 요청 성공")
+    alert('미션 요청 성공');
     setIsDrawerOpen(false);
   };
 
