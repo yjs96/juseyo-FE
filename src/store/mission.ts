@@ -5,6 +5,7 @@ export interface MissionType {
   content: string;
   category: string;
   endDate: string;
+  doneDate: string;
   point: number;
 }
 
@@ -29,35 +30,35 @@ export interface FailMissionType {
 //recoil state 생성
 export const progressMissionState = atom<MissionType[]>({
   key: 'progressMissionState',
-  default: []
+  default: [],
 });
 
 export const completeMissionState = atom<CompleteMissionType[]>({
   key: 'completeMissionState',
-  default: []
+  default: [],
 });
 
 export const failMissionState = atom<FailMissionType[]>({
   key: 'failMissionState',
-  default: []
+  default: [],
 });
 
 export const requestMissionState = atom<MissionType[]>({
   key: 'requestMissionState',
-  default: []
+  default: [],
 });
 
 export const isMissionRequestedState = atom<boolean>({
   key: 'isMissionRequestState',
-  default: false // 초기값은 false
+  default: false, // 초기값은 false
 });
 
 export const requestMissionUpdateTriggerState = atom<string>({
   key: 'requestMissionUpdateTriggerState',
-  default: '' // 초기값은 ''
+  default: '', // 초기값은 ''
 });
 
 export const progressMissionUpdateTriggerState = atom<string>({
   key: 'progressMissionUpdateTriggerState',
-  default: '' // 초기값은 ''
+  default: '', // 초기값은 ''
 });
