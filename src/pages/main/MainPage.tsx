@@ -33,6 +33,7 @@ export default function MainPage() {
   // 자녀
   const getChildData = async () => {
     try {
+      localStorage.removeItem('accessToken');
       const res = await login('joonsu.96@daum.net', 'admin');
       // console.log(res.data); // 응답 데이터 처리
       localStorage.setItem('accessToken', res.accessToken);
@@ -47,6 +48,7 @@ export default function MainPage() {
   // 부모
   const getParentData = async () => {
     try {
+      localStorage.removeItem('accessToken');
       const res = await login('dks729927@gmail.com', 'admin');
       // console.log(res.data); // 응답 데이터 처리
       localStorage.setItem('accessToken', res.accessToken);
@@ -175,7 +177,7 @@ export default function MainPage() {
           <SectionHeader title="최근 학습" path="/edu" />
           <VideoContent {...videoInfo} />
         </Section>
-        <div className="mt-40 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mt-40">
           <Button onClick={() => getChildData()}>자녀 로그인</Button>
           <Button onClick={() => getParentData()}>부모 로그인</Button>
           <Button onClick={() => location.reload()}>새로고침</Button>
