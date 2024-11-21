@@ -15,6 +15,8 @@ import { format } from 'date-fns';
 import { Calendar } from './ui/calendar';
 import { CalendarIcon } from 'lucide-react';
 import { Input } from './ui/input';
+import { postRequestMission } from '@/api/requestMission';
+import { useNavigate } from 'react-router-dom';
 
 interface AddMissionProps {
   iconSrc: string;
@@ -22,6 +24,8 @@ interface AddMissionProps {
 }
 
 const AddMission = ({ iconSrc, alt }: AddMissionProps) => {
+  const navigate = useNavigate();
+
   const category = ['일상', '집안일', '학습', '자기관리', '심부름', '기타'];
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -35,7 +39,7 @@ const AddMission = ({ iconSrc, alt }: AddMissionProps) => {
     setSelectedCategory(category);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     const requestData = {
       startDate: startDate ? format(startDate, 'yyyy-MM-dd') : '',
       endDate: endDate ? format(endDate, 'yyyy-MM-dd') : '',
@@ -44,7 +48,13 @@ const AddMission = ({ iconSrc, alt }: AddMissionProps) => {
       point: missionPoint
     };
 
-    console.log(requestData);
+    const res = await postRequestMission(requestData);
+
+    if(!(res.status==200)){
+      throw new Error(`미션 요청 실패`)
+    }
+    alert("미션 요청 성공")
+    setIsDrawerOpen(false);
   };
 
   const isFormValid = () => {
