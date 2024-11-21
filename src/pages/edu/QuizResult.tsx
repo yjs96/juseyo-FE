@@ -1,6 +1,7 @@
 // import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import toast from 'react-hot-toast';
 
 import MainFrame from '@/components/MainFrame';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,9 @@ export default function QuizResult() {
   };
 
   const isPassed = score >= answers.length * 0.7;
+  if (isPassed) {
+    toast.success('포인트가 적립됐어요');
+  }
 
   const handleRetry = () => {
     navigate(`/edu/${param}`);

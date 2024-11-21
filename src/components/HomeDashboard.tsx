@@ -4,29 +4,60 @@ import { useEffect, useState } from 'react';
 
 interface HomeDashBoardProps {
   name: string;
-  level: number;
-  money: number;
   point: number;
+  money: number;
   successfulMisson: number;
 }
 
+const getLevelInfo = (point: number) => {
+  const roundedPoint = Math.round(point / 10) * 10;
+  const levels = [
+    { min: 0, max: 500, name: '설레는 첫걸음' },
+    { min: 500, max: 1000, name: '똑똑한 두걸음' },
+    { min: 1000, max: 1500, name: '씩씩한 세걸음' },
+    { min: 1500, max: 2500, name: '희망찬 네걸음' },
+    { min: 2500, max: 3500, name: '즐거운 다섯걸음' },
+    { min: 3500, max: 5000, name: '무럭무럭 여섯걸음' },
+    { min: 5000, max: 6500, name: '굳건한 일곱걸음' },
+    { min: 6500, max: 8500, name: '행운의 여덟걸음' },
+    { min: 8500, max: 10500, name: '용기의 아홉걸음' },
+    { min: 10500, max: Infinity, name: '만족의 열걸음' },
+  ];
+
+  const currentLevel =
+    levels.findIndex((level) => roundedPoint < level.max) + 1;
+  const levelInfo = levels[currentLevel - 1];
+
+  const nextLevelPoint = currentLevel < 10 ? levelInfo.max - roundedPoint : 0;
+  const progress =
+    ((roundedPoint - levelInfo.min) / (levelInfo.max - levelInfo.min)) * 100;
+
+  return {
+    level: currentLevel,
+    name: levelInfo.name,
+    nextPoint: nextLevelPoint,
+    progress: Math.min(progress, 100),
+  };
+};
+
 const HomeDashBoard = ({
   name,
-  level,
-  money,
   point,
+  money,
   successfulMisson,
 }: HomeDashBoardProps) => {
   const [progress, setProgress] = useState<number>(0);
+  const levelInfo = getLevelInfo(point);
 
   useEffect(() => {
     setTimeout(() => {
-      setProgress(33);
+      setProgress(levelInfo.progress);
     }, 240);
-  }, []);
+  }, [levelInfo.progress]);
+
   return (
     <HomeDashboard>
-      <Name>{name}님,</Name>
+      <Name>{name}님의</Name>
       <ContentContainer>
         <SavedCard>
           <TextContainer>
@@ -37,8 +68,11 @@ const HomeDashBoard = ({
         </SavedCard>
         <LevelCard>
           <LevelContainer>
-            <Title>현재 레벨 {level}</Title>
-            <Point>다음 레벨까지 {point}P</Point>
+            <div className="flex items-center">
+              <Title>현재 레벨 {levelInfo.level}</Title>
+              <span>{levelInfo.name}</span>
+            </div>
+            <Point>다음 레벨까지 {levelInfo.nextPoint}P</Point>
           </LevelContainer>
           <Progress value={progress} />
         </LevelCard>
@@ -122,4 +156,11 @@ const LevelCard = styled.div`
 const LevelContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
+
+  div > span {
+    font-size: 12px;
+    color: var(--dark-gray);
+    margin-left: 8px;
+  }
 `;

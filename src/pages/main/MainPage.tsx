@@ -1,7 +1,17 @@
 import styled from 'styled-components';
 
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { isUserParentState, userInfoState } from '@/store/userInfo';
+import { login } from '@/api/auth';
+import { getCompleteMission, getProgressMission } from '@/api/mission';
+import { useRecoilState } from 'recoil';
+import {
+  completeMissionState,
+  MissionType,
+  progressMissionState,
+} from '@/store/mission';
+import { getUserInfo } from '@/api/userInfo';
 
 import NavBar from '@/components/NavBar';
 import HomeDashBoard from '@/components/HomeDashboard';
@@ -9,13 +19,7 @@ import SectionHeader from '@/components/SectionHeader';
 import MissionCard from '@/components/MissionCard';
 import VideoContent from '@/components/VideoContent';
 import { Button } from '@/components/ui/button';
-
-import { login } from '@/api/auth';
-import { getCompleteMission, getProgressMission } from '@/api/mission';
-import { useRecoilState } from 'recoil';
-import { completeMissionState, progressMissionState } from '@/store/mission';
-import { getUserInfo } from '@/api/userInfo';
-import { isUserParentState } from '@/store/userInfo';
+import axiosInstance from '@/api/instance';
 
 export default function MainPage() {
   const [progressMission, setProgreesMission] =
@@ -23,6 +27,8 @@ export default function MainPage() {
   const [completeMission, setCompleteMission] =
     useRecoilState(completeMissionState);
   const [isUserParent, setIsUserParent] = useRecoilState(isUserParentState);
+  const [userInfo, setUserInfo] = useRecoilState(userInfoState);
+  const [childPoint, setChildPoint] = useState(0);
 
   // 자녀
   const getChildData = async () => {
@@ -30,6 +36,8 @@ export default function MainPage() {
       const res = await login('admin_child', 'admin');
       // console.log(res.data); // 응답 데이터 처리
       localStorage.setItem('accessToken', res.accessToken);
+      fetchProgressMission();
+      fetchCompleteMission();
       getUserType();
     } catch (error) {
       console.error('Error during login:', error);
@@ -42,6 +50,8 @@ export default function MainPage() {
       const res = await login('dks729927@gmail.com', 'admin');
       // console.log(res.data); // 응답 데이터 처리
       localStorage.setItem('accessToken', res.accessToken);
+      fetchProgressMission();
+      fetchCompleteMission();
       getUserType();
     } catch (error) {
       console.error('Error during login:', error);
@@ -50,9 +60,13 @@ export default function MainPage() {
 
   const getUserType = async () => {
     const response = await getUserInfo();
-    console.log(response);
+    setUserInfo(response);
+    // console.log(response);
     if (response.type === 'parent') {
       setIsUserParent(true);
+    } else {
+      const response = await axiosInstance.get('/mypage/point');
+      setChildPoint(response.data.totalPoints);
     }
   };
 
@@ -69,11 +83,25 @@ export default function MainPage() {
   const fetchCompleteMission = async () => {
     try {
       const res = await getCompleteMission();
-      // console.log(res.data)
+      // console.log(res);
       setCompleteMission(res);
     } catch (error) {
       throw new Error(`fetchCompleteMission Error: ${error}`);
     }
+  };
+
+  const getCurrentMonthMissionCount = (missions: MissionType[]) => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+
+    return missions.filter((mission: MissionType) => {
+      const doneDate = new Date(mission.doneDate);
+      return (
+        doneDate.getMonth() === currentMonth &&
+        doneDate.getFullYear() === currentYear
+      );
+    }).length;
   };
 
   // fetchData();
@@ -91,15 +119,21 @@ export default function MainPage() {
       '신용의 원리와 중요성에 대해 이해하고 어떻게 하면 신용을 쌓을 수 있을지 알아보도록 해요.🔎',
     videoUrl: 'https://www.youtube.com/watch?v=md1-qbKR_eI',
   };
+
   return (
     <>
       <NavBar />
       <HomeDashBoard
-        name="문효만"
-        level={1}
-        money={20500}
-        point={230}
-        successfulMisson={2}
+        name={
+          isUserParent
+            ? `자녀 ${userInfo.childNameList[0].name}`
+            : userInfo.name
+        }
+        point={
+          isUserParent ? userInfo.childNameList[0].point / 7 : childPoint / 7
+        }
+        money={isUserParent ? userInfo.childNameList[0].point : childPoint}
+        successfulMisson={getCurrentMonthMissionCount(completeMission)}
       />
       <BottomHalf>
         <Section>

@@ -6,6 +6,13 @@ export interface UserInfoType {
   password: string;
   accountNum: string;
   type: string;
+  parentName: string | 1;
+  childNameList: ChildName[];
+}
+
+interface ChildName {
+  name: string | '';
+  point: number | 0;
 }
 
 export interface PointType {
@@ -20,6 +27,21 @@ export const userInfoState = atom<UserInfoType>({
     password: '',
     accountNum: '',
     type: '',
+    parentName: '',
+    childNameList: [
+      {
+        name: '',
+        point: 0,
+      },
+      {
+        name: '',
+        point: 0,
+      },
+      {
+        name: '',
+        point: 0,
+      },
+    ],
   },
 });
 

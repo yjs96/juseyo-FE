@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
 
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { getUserInfo } from '@/api/userInfo';
 import { userInfoState } from '@/store/userInfo';
 import { completeMissionState } from '@/store/mission';
@@ -41,36 +41,40 @@ export default function MyPage() {
   const [mypageInfo, setMyPageInfo] = useState<MypageInfoType>();
   const [completeMission, setCompleteMission] =
     useRecoilState(completeMissionState);
+  const childParentInfo = useRecoilValue(userInfoState);
 
   const navigate = useNavigate();
 
   const kakaoSend = {
-    userName: userInfo.name,
-    parentId: userInfo.id,
+    userName: '문준영',
+    parentId: 'wnsdudwkd@gmail.com',
   };
 
   const newStr: string = JSON.stringify(kakaoSend);
   const encodedInfo = btoa(encodeURIComponent(newStr));
   // decodeURIComponent(atob(인코딩된문자열))로 가입링크 받기
   // console.log(encodedInfo);
+  // console.log(newStr);
 
   const shareKakao = () => {
-    window.Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title: `${userInfo.name}님이 초대했어요💸`,
-        description: `작은 미션으로 시작하는 우리 아이 경제교육`,
-        imageUrl: 'https://ifh.cc/g/pz0v8Z.png',
-        imageWidth: 200,
-        imageHeight: 100,
-        link: {
-          mobileWebUrl: `${
-            import.meta.env.VITE_FRONT_BASE
-          }/signup/${encodedInfo}`,
-          webUrl: `${import.meta.env.VITE_FRONT_BASE}/signup/${encodedInfo}`,
+    if (childParentInfo.childNameList[0].name === '') {
+      window.Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+          title: `${userInfo.name}님이 초대했어요💸`,
+          description: `작은 미션으로 시작하는 우리 아이 경제교육`,
+          imageUrl: 'https://ifh.cc/g/G9nx17.png',
+          imageWidth: 200,
+          imageHeight: 100,
+          link: {
+            mobileWebUrl: `${
+              import.meta.env.VITE_FRONT_BASE
+            }/signup/${encodedInfo}`,
+            webUrl: `${import.meta.env.VITE_FRONT_BASE}/signup/${encodedInfo}`,
+          },
         },
-      },
-    });
+      });
+    }
   };
 
   const shareAchievements = () => {
@@ -83,7 +87,7 @@ export default function MyPage() {
         }개의 미션을 성공하고\n용돈 ${completeMission
           .reduce((sum, mission) => sum + mission.point, 0)
           .toLocaleString()}원을 모았어요👏\n주세요로 용돈 모아보러 갈까요?`,
-        imageUrl: 'https://ifh.cc/g/pz0v8Z.png',
+        imageUrl: 'https://ifh.cc/g/G9nx17.png',
         imageWidth: 200,
         imageHeight: 100,
         link: {
@@ -132,7 +136,7 @@ export default function MyPage() {
     const res = await axiosInstance.get('/mypage/profile');
     const data = res.data;
     setMyPageInfo(data);
-    console.log(data);
+    // console.log(data);
   };
 
   const fetchUserInfo = async () => {
@@ -167,7 +171,11 @@ export default function MyPage() {
       <MainFrame $headbar $navbar $padded $bgGray>
         <ProfileFrame>
           <ImageFrame>
-            <img src="/images/profile-image.jpg" alt="" />
+            {isParent ? (
+              <img src="/images/profile-image-parent.jpg" alt="parent" />
+            ) : (
+              <img src="/images/profile-image.jpg" alt="child" />
+            )}
           </ImageFrame>
           <UserInfo>
             <div>{userInfo.name}</div>
@@ -260,12 +268,25 @@ export default function MyPage() {
         </MenuFrame>
         <MenuFrame>
           <MenuDesc>계정</MenuDesc>
-          <Menu onClick={() => shareKakao()}>
-            <div>연동하기(해야됨)</div>
-          </Menu>
+
+          {isParent && (
+            <Menu onClick={() => shareKakao()}>
+              <div>
+                {childParentInfo.childNameList[0].name !== '' ? (
+                  <DarkGray>자녀 초대됨</DarkGray>
+                ) : (
+                  '자녀 초대하기'
+                )}
+              </div>
+            </Menu>
+          )}
           <Menu>
-            <div>{isParent ? '자녀' : '부모님'} 아이디</div>
-            <div>문준일(해야됨)</div>
+            <div>{isParent ? '자녀' : '부모님'} 이름</div>
+            <div>
+              {isParent && childParentInfo.childNameList[0].name !== ''
+                ? childParentInfo.childNameList[0].name
+                : childParentInfo.parentName}
+            </div>
           </Menu>
           <Menu>
             <div className="text-[var(--red)]" onClick={() => handleLogout()}>
@@ -382,4 +403,8 @@ const Menu = styled.div`
   align-items: center;
   padding: 0 20px;
   border-bottom: 1px solid var(--border);
+`;
+
+const DarkGray = styled.div`
+  color: var(--dark-gray);
 `;

@@ -75,7 +75,7 @@ const AddMission = ({ iconSrc, alt }: AddMissionProps) => {
       <DrawerTrigger asChild>
         <img src={iconSrc} alt={alt} onClick={() => setIsDrawerOpen(true)} />
       </DrawerTrigger>
-      <DrawerContent className="px-5">
+      <DrawerContent className="px-5 max-w-[600px] m-auto">
         {/* 카테고리 선택 */}
         <DrawerHeader>
           <DrawerTitle></DrawerTitle>
