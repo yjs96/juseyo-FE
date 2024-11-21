@@ -33,7 +33,7 @@ export default function MainPage() {
   // 자녀
   const getChildData = async () => {
     try {
-      const res = await login('admin_child', 'admin');
+      const res = await login('joonsu.96@daum.net', 'admin');
       // console.log(res.data); // 응답 데이터 처리
       localStorage.setItem('accessToken', res.accessToken);
       fetchProgressMission();
