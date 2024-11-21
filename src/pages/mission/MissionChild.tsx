@@ -9,14 +9,14 @@ import {
   failMissionState,
   isMissionRequestedState,
   progressMissionState,
-  requestMissionState
+  requestMissionState,
 } from '@/store/mission';
 
 import {
   getCompleteMission,
   getFailMission,
   getProgressMission,
-  getRequestMission
+  getRequestMission,
 } from '@/api/mission';
 
 import CategoryButton from '@/components/CategoryButton';
@@ -29,7 +29,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@/components/ui/select';
 import FinishedMissionCard from '@/components/FinishedMissionCard';
 
@@ -42,7 +42,7 @@ export default function MissionChild() {
     '학습',
     '자기관리',
     '심부름',
-    '기타'
+    '기타',
   ];
   const months = [
     '01',
@@ -56,7 +56,7 @@ export default function MissionChild() {
     '09',
     '10',
     '11',
-    '12'
+    '12',
   ];
   const currentMonth = getCurrentMonth();
 
@@ -80,13 +80,13 @@ export default function MissionChild() {
       ...completeMission.map((mission) => ({
         ...mission,
         date: mission.doneDate,
-        isCompleted: true
+        isCompleted: true,
       })),
       ...failMission.map((mission) => ({
         ...mission,
         date: mission.failDate,
-        isCompleted: false
-      }))
+        isCompleted: false,
+      })),
     ];
     const sortedMissions = combinedMissions.sort((a, b) => {
       return new Date(b.date!).getTime() - new Date(a.date!).getTime();
@@ -159,7 +159,7 @@ export default function MissionChild() {
     setProgreesMission,
     setRequestMission,
     isMissionRequested,
-    setIsMissionRequested
+    setIsMissionRequested,
   ]);
 
   return (
@@ -268,6 +268,7 @@ const MissionSection = styled.div<{ $activeTab: number }>`
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 16px;
+  background-color: var(--white);
 `;
 
 const Text = styled.p`
