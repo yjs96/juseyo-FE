@@ -46,8 +46,8 @@ export default function MyPage() {
   const navigate = useNavigate();
 
   const kakaoSend = {
-    userName: '문준영',
-    parentId: 'wnsdudwkd@gmail.com',
+    userName: userInfo.name,
+    parentId: userInfo.id,
   };
 
   const newStr: string = JSON.stringify(kakaoSend);
@@ -179,7 +179,7 @@ export default function MyPage() {
           </ImageFrame>
           <UserInfo>
             <div>{userInfo.name}</div>
-            <span>{mypageInfo?.level}</span>
+            <span>{isParent ? '부모 계정' : '자녀 계정'}</span>
           </UserInfo>
           <ButtonFrame>
             <Dialog>
