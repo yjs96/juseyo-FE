@@ -108,7 +108,7 @@ export default function MainPage() {
   useEffect(() => {
     fetchProgressMission();
     fetchCompleteMission();
-  }, [setCompleteMission, setProgreesMission]);
+  }, []);
 
   const navigate = useNavigate();
   const videoInfo = {
