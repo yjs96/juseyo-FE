@@ -8,7 +8,7 @@ export default function RedirectPage() {
   useEffect(() => {
     // URL에서 인증 코드 추출
     const code = new URL(window.location.href).searchParams.get('code');
-    console.log(code);
+    // console.log(code);
 
     if (!code) {
       console.error('인증 코드가 없습니다.');
@@ -23,12 +23,12 @@ export default function RedirectPage() {
           `/auth/login/kakao?code=${code}`
         );
 
-        console.log(response);
-        console.log(response.data);
+        // console.log(response);
+        // console.log(response.data);
 
         // 응답으로 받은 토큰을 로컬 스토리지에 저장
         localStorage.setItem('accessToken', response.data.accessToken);
-        console.log('토큰 있는디용?');
+        // console.log('토큰 있는디용?');
 
         // 필요한 경우 리프레시 토큰도 저장
         // if (response.data.refreshToken) {

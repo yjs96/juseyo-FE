@@ -4,12 +4,12 @@ import {
   getProgressMissionComplete,
   getProgressMissionFail,
   getRequestMissionApprove,
-  getRequestMissionReject
+  getRequestMissionReject,
 } from '@/api/requestMission';
 import toast from 'react-hot-toast';
 import {
   progressMissionUpdateTriggerState,
-  requestMissionUpdateTriggerState
+  requestMissionUpdateTriggerState,
 } from '@/store/mission';
 import { useSetRecoilState } from 'recoil';
 
@@ -33,7 +33,7 @@ const MissionActionCard = ({
   category,
   point,
   endDate,
-  buttons
+  buttons,
 }: MissionActionCardProps) => {
   const setRequestMissionUpdateTrigger = useSetRecoilState(
     requestMissionUpdateTriggerState
@@ -53,7 +53,7 @@ const MissionActionCard = ({
 
     if (hoursRemaining <= 24 && hoursRemaining > 0)
       return `${hoursRemaining}시간 남음`;
-    if (daysRemaining >= 1) return `D-${daysRemaining}`;
+    if (daysRemaining >= 1) return `${daysRemaining}일 남음`;
     if (hoursRemaining <= 0)
       return `${deadlineDate.getMonth() + 1}월 ${deadlineDate.getDate()}일`;
   };

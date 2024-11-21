@@ -18,7 +18,7 @@ const FinishedMissionCard = ({
   category,
   point,
   date,
-  isCompleted
+  isCompleted,
 }: FinishedMissionCardProps) => {
   const getTimeRemaining = (finishedDate: string) => {
     const now = new Date();
@@ -31,7 +31,7 @@ const FinishedMissionCard = ({
 
     if (hoursRemaining <= 24 && hoursRemaining > 0)
       return `${hoursRemaining}시간 남음`;
-    if (daysRemaining >= 1) return `D-${daysRemaining}`;
+    if (daysRemaining >= 1) return `${daysRemaining}일 남음`;
     if (hoursRemaining <= 0)
       return `${deadlineDate.getMonth() + 1}월 ${deadlineDate.getDate()}일`;
   };

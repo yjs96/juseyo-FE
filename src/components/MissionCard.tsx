@@ -16,7 +16,7 @@ const MissionCard = ({
   content,
   category,
   endDate,
-  point
+  point,
 }: MissionCardProps) => {
   const getTimeRemaining = (endDate: string) => {
     const now = new Date();
@@ -29,7 +29,7 @@ const MissionCard = ({
 
     if (hoursRemaining <= 24 && hoursRemaining > 0)
       return `${hoursRemaining}시간 남음`;
-    if (daysRemaining >= 1) return `D-${daysRemaining}`;
+    if (daysRemaining >= 1) return `${daysRemaining}일 남음`;
     if (hoursRemaining <= 0)
       return `${deadlineDate.getMonth() + 1}월 ${deadlineDate.getDate()}일`;
   };
