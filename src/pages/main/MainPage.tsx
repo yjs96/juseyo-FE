@@ -8,50 +8,76 @@ import HomeDashBoard from '@/components/HomeDashboard';
 import SectionHeader from '@/components/SectionHeader';
 import MissionCard from '@/components/MissionCard';
 import VideoContent from '@/components/VideoContent';
+import { Button } from '@/components/ui/button';
 
 import { login } from '@/api/auth';
 import { getCompleteMission, getProgressMission } from '@/api/mission';
 import { useRecoilState } from 'recoil';
 import { completeMissionState, progressMissionState } from '@/store/mission';
+import { getUserInfo } from '@/api/userInfo';
+import { isUserParentState } from '@/store/userInfo';
 
 export default function MainPage() {
   const [progressMission, setProgreesMission] =
     useRecoilState(progressMissionState);
   const [completeMission, setCompleteMission] =
     useRecoilState(completeMissionState);
+  const [isUserParent, setIsUserParent] = useRecoilState(isUserParentState);
 
+  // 자녀
+  const getChildData = async () => {
+    try {
+      const res = await login('admin_child', 'admin');
+      // console.log(res.data); // 응답 데이터 처리
+      localStorage.setItem('accessToken', res.accessToken);
+      getUserType();
+    } catch (error) {
+      console.error('Error during login:', error);
+    }
+  };
+
+  // 부모
+  const getParentData = async () => {
+    try {
+      const res = await login('dks729927@gmail.com', 'admin');
+      // console.log(res.data); // 응답 데이터 처리
+      localStorage.setItem('accessToken', res.accessToken);
+      getUserType();
+    } catch (error) {
+      console.error('Error during login:', error);
+    }
+  };
+
+  const getUserType = async () => {
+    const response = await getUserInfo();
+    console.log(response);
+    if (response.type === 'parent') {
+      setIsUserParent(true);
+    }
+  };
+
+  const fetchProgressMission = async () => {
+    try {
+      const res = await getProgressMission();
+      // console.log(res.data)
+      setProgreesMission(res);
+    } catch (error) {
+      throw new Error(`fetchProgressMission Error: ${error}`);
+    }
+  };
+
+  const fetchCompleteMission = async () => {
+    try {
+      const res = await getCompleteMission();
+      // console.log(res.data)
+      setCompleteMission(res);
+    } catch (error) {
+      throw new Error(`fetchCompleteMission Error: ${error}`);
+    }
+  };
+
+  // fetchData();
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await login('admin_child', 'admin');
-        // console.log(res.data); // 응답 데이터 처리
-        localStorage.setItem('accessToken', res.accessToken);
-      } catch (error) {
-        console.error('Error during login:', error);
-      }
-    };
-
-    const fetchProgressMission = async () => {
-      try {
-        const res = await getProgressMission();
-        // console.log(res.data)
-        setProgreesMission(res);
-      } catch (error) {
-        throw new Error(`fetchProgressMission Error: ${error}`);
-      }
-    };
-
-    const fetchCompleteMission = async () => {
-      try {
-        const res = await getCompleteMission();
-        // console.log(res.data)
-        setCompleteMission(res);
-      } catch (error) {
-        throw new Error(`fetchCompleteMission Error: ${error}`);
-      }
-    };
-
-    fetchData();
     fetchProgressMission();
     fetchCompleteMission();
   }, [setCompleteMission, setProgreesMission]);
@@ -63,7 +89,7 @@ export default function MainPage() {
     title: '신나는 신용생활 [EP.1]',
     description:
       '신용의 원리와 중요성에 대해 이해하고 어떻게 하면 신용을 쌓을 수 있을지 알아보도록 해요.🔎',
-    videoUrl: 'https://www.youtube.com/watch?v=md1-qbKR_eI'
+    videoUrl: 'https://www.youtube.com/watch?v=md1-qbKR_eI',
   };
   return (
     <>
@@ -76,8 +102,6 @@ export default function MainPage() {
         successfulMisson={2}
       />
       <BottomHalf>
-        <div onClick={() => navigate('/signup')}>회원가입</div>
-        <div onClick={() => navigate('/login')}>로그인</div>
         <Section>
           <SectionHeader title="진행 중인 미션" path="/mission/child" />
           <CardContainer>
@@ -117,6 +141,14 @@ export default function MainPage() {
           <SectionHeader title="최근 학습" path="/edu" />
           <VideoContent {...videoInfo} />
         </Section>
+        <div className="mt-40 flex flex-wrap gap-2">
+          <Button onClick={() => getChildData()}>자녀 로그인</Button>
+          <Button onClick={() => getParentData()}>부모 로그인</Button>
+          <Button onClick={() => location.reload()}>새로고침</Button>
+          <Button onClick={() => navigate('/login')}>로그인페이지</Button>
+          <Button onClick={() => navigate('/signup')}>회원가입페이지</Button>
+          <div>{isUserParent ? '부모' : '자식'}</div>
+        </div>
       </BottomHalf>
     </>
   );

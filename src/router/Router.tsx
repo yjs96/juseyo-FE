@@ -13,7 +13,7 @@ import SignUpSuccess from '@/pages/login/SignUpSuccess';
 import LoginPage from '@/pages/login/LoginPage';
 import RedirectPage from '@/pages/login/RedirectPage';
 import MissionParents from '@/pages/mission/MissionParents';
-
+import StatsPage from '@/pages/statistics/StatsPage';
 
 function ThemeColorManager() {
   const location = useLocation();
@@ -50,6 +50,7 @@ export default function Router() {
         <Route path="/signup/:id" element={<SignUp />}></Route>
         <Route path="/signup/success" element={<SignUpSuccess />}></Route>
         <Route path="/redirect" element={<RedirectPage />}></Route>
+        <Route path="/stats" element={<StatsPage />}></Route>
       </Routes>
     </BrowserRouter>
   );

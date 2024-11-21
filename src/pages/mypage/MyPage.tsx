@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import toast from 'react-hot-toast';
 
 import { useRecoilState } from 'recoil';
 import { getUserInfo } from '@/api/userInfo';
@@ -22,7 +23,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-  DialogClose
+  DialogClose,
 } from '@/components/ui/dialog';
 import axiosInstance from '@/api/instance';
 
@@ -108,6 +109,7 @@ export default function MyPage() {
         const res = await axiosInstance.get(
           `/mypage/point/charge/${withdrawAmount}`
         );
+        toast.success('주세요 지갑에 충전했어요');
         console.log(res.data);
       } catch (error) {
         console.log(error);
@@ -117,6 +119,7 @@ export default function MyPage() {
         const res = await axiosInstance.get(
           `/mypage/point/withdraw/${withdrawAmount}`
         );
+        toast.success('용돈을 계좌로 옮겼어요');
         console.log(res.data);
       } catch (error) {
         console.log(error);
@@ -129,6 +132,7 @@ export default function MyPage() {
     const res = await axiosInstance.get('/mypage/profile');
     const data = res.data;
     setMyPageInfo(data);
+    console.log(data);
   };
 
   const fetchUserInfo = async () => {
@@ -139,12 +143,14 @@ export default function MyPage() {
   };
 
   const fetchCompleteMission = async () => {
-    try {
-      const res = await getCompleteMission();
-      // console.log(res.data);
-      setCompleteMission(res.data);
-    } catch (error) {
-      throw new Error(`fetchCompleteMission Error: ${error}`);
+    if (isParent) {
+      try {
+        const res = await getCompleteMission();
+        // console.log(res.data);
+        setCompleteMission(res.data);
+      } catch (error) {
+        throw new Error(`fetchCompleteMission Error: ${error}`);
+      }
     }
   };
 
@@ -227,22 +233,26 @@ export default function MyPage() {
         <MenuFrame>
           <MenuDesc>정보</MenuDesc>
           <Menu>
-            <div>이번달 용돈</div>
+            <div>{isParent ? '계좌 잔액' : '이번달 용돈'}</div>
             <div>{mypageInfo?.totalPoint.toLocaleString()}원</div>
           </Menu>
-          <Menu>
-            <div>누적 용돈</div>
-            <div>
-              {completeMission
-                .reduce((sum, mission) => sum + mission.point, 0)
-                .toLocaleString()}
-              원
-            </div>
-          </Menu>
-          <Menu>
-            <div>완료한 미션</div>
-            <div>{completeMission.length}개</div>
-          </Menu>
+          {!isParent && (
+            <>
+              <Menu>
+                <div>누적 용돈</div>
+                <div>
+                  {completeMission
+                    .reduce((sum, mission) => sum + mission.point, 0)
+                    .toLocaleString()}
+                  원
+                </div>
+              </Menu>
+              <Menu>
+                <div>완료한 미션</div>
+                <div>{completeMission.length}개</div>
+              </Menu>
+            </>
+          )}
           <Menu>
             <div>계좌 번호</div>
             <div>{userInfo.accountNum}</div>
@@ -254,7 +264,7 @@ export default function MyPage() {
             <div>연동하기(해야됨)</div>
           </Menu>
           <Menu>
-            <div>부모님 아이디</div>
+            <div>{isParent ? '자녀' : '부모님'} 아이디</div>
             <div>문준일(해야됨)</div>
           </Menu>
           <Menu>

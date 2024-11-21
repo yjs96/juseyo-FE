@@ -1,6 +1,8 @@
 // import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import { useRecoilValue } from 'recoil';
+import { isUserParentState } from '@/store/userInfo';
 
 interface NavTab {
   path: string;
@@ -10,29 +12,60 @@ interface NavTab {
 
 function NavBar() {
   const location = useLocation();
+  const isUserParent = useRecoilValue(isUserParentState);
 
-  const navTabs: NavTab[] = [
+  const parentTabs: NavTab[] = [
     {
       path: '/',
       name: '홈',
-      icon: 'fa-solid fa-house'
+      icon: 'fa-solid fa-house',
     },
     {
-      path: '/mission/child',
+      path: '/mission/parents',
       name: '미션',
-      icon: 'fa-solid fa-rectangle-list'
+      icon: 'fa-solid fa-rectangle-list',
     },
     {
-      path: '/edu',
-      name: '교육',
-      icon: 'fa-solid fa-pen'
+      path: '/stats',
+      name: '통계',
+      icon: 'fa-solid fa-chart-pie',
     },
     {
       path: '/mypage',
       name: '마이페이지',
-      icon: 'fa-solid fa-user'
-    }
+      icon: 'fa-solid fa-user',
+    },
   ];
+
+  const childTabs: NavTab[] = [
+    {
+      path: '/',
+      name: '홈',
+      icon: 'fa-solid fa-house',
+    },
+    {
+      path: '/mission/child',
+      name: '미션',
+      icon: 'fa-solid fa-rectangle-list',
+    },
+    {
+      path: '/edu',
+      name: '교육',
+      icon: 'fa-solid fa-pen',
+    },
+    {
+      path: '/mypage',
+      name: '마이페이지',
+      icon: 'fa-solid fa-user',
+    },
+  ];
+
+  const navTabs = (): NavTab[] => {
+    if (isUserParent) {
+      return parentTabs;
+    }
+    return childTabs;
+  };
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -44,7 +77,7 @@ function NavBar() {
   return (
     <>
       <NavBarFrame>
-        {navTabs.map((tab, idx) => (
+        {navTabs().map((tab, idx) => (
           <StyledLink to={tab.path} key={idx}>
             <Tab className={isActive(tab.path) ? 'active' : ''}>
               <i className={tab.icon}></i>

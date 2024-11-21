@@ -3,8 +3,8 @@ import AddMission from './AddMission';
 
 interface HeaderProps {
   title: string;
-  iconSrc: string;
-  alt: string;
+  iconSrc?: string;
+  alt?: string;
 }
 
 const Header = ({ title, iconSrc, alt }: HeaderProps) => {
@@ -13,7 +13,7 @@ const Header = ({ title, iconSrc, alt }: HeaderProps) => {
       <HeaderContainer>
         <h1>{title}</h1>
         {alt === '추가' ? (
-          <AddMission iconSrc={iconSrc} alt={alt} />
+          <AddMission iconSrc={iconSrc || ''} alt={alt} />
         ) : (
           <img src={iconSrc} alt={alt} />
         )}

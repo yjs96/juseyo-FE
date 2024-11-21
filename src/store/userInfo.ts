@@ -29,3 +29,8 @@ export const pointState = atom<PointType>({
     totalPoints: 0,
   },
 });
+
+export const isUserParentState = atom<boolean>({
+  key: 'isUserParentState',
+  default: false,
+});
