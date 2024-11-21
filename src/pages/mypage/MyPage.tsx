@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-  DialogClose,
+  DialogClose
 } from '@/components/ui/dialog';
 import { useState } from 'react';
 
@@ -30,7 +30,7 @@ export default function MyPage() {
 
   const kakaoSend = {
     userName: userName,
-    parentId: userId,
+    parentId: userId
   };
 
   const newStr: string = JSON.stringify(kakaoSend);
@@ -49,9 +49,9 @@ export default function MyPage() {
         imageHeight: 100,
         link: {
           mobileWebUrl: `http://localhost:5173/signup/${encodedInfo}`,
-          webUrl: `http://localhost:5173/signup/${encodedInfo}`,
-        },
-      },
+          webUrl: `http://localhost:5173/signup/${encodedInfo}`
+        }
+      }
     });
   };
 

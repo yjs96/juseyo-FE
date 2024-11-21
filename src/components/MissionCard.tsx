@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 
 interface MissionCardProps {
-  title: string;
+  content: string;
   category: string;
-  amount: number;
-  deadline: string;
+  endDate: string;
+  point: number;
 }
 
 interface CategoryInfo {
@@ -13,14 +13,14 @@ interface CategoryInfo {
 }
 
 const MissionCard = ({
-  title,
+  content,
   category,
-  amount,
-  deadline
+  endDate,
+  point
 }: MissionCardProps) => {
-  const getTimeRemaining = (deadline: string) => {
+  const getTimeRemaining = (endDate: string) => {
     const now = new Date();
-    const deadlineDate = new Date(deadline);
+    const deadlineDate = new Date(endDate);
 
     const timeDifference = deadlineDate.getTime() - now.getTime();
 
@@ -44,13 +44,13 @@ const MissionCard = ({
           <span>{category}</span>
         </CategoryBadge>
         <TextContainer>
-          <h1>{title}</h1>
-          <p>{getTimeRemaining(deadline)}</p>
+          <h1>{content}</h1>
+          <p>{getTimeRemaining(endDate)}</p>
         </TextContainer>
       </TopContainer>
       <BottomContainer>
         <img src="/icons/point.svg" alt="포인트" />
-        <p>{amount.toLocaleString()}</p>
+        <p>{point.toLocaleString()}</p>
       </BottomContainer>
     </Container>
   );

@@ -1,83 +1,168 @@
-// import React from 'react';
-import { getRequestMission } from "@/api/mission";
-import CategoryButton from "@/components/CategoryButton";
-import Header from "@/components/Header";
-import MissionCard from "@/components/MissionCard";
-import NavBar from "@/components/NavBar";
-import TabBar from "@/components/TabBar";
+import styled from 'styled-components';
+
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+
+import { useRecoilState } from 'recoil';
+import {
+  completeMissionState,
+  failMissionState,
+  progressMissionState,
+  requestMissionState
+} from '@/store/mission';
+
+import { login } from '@/api/auth';
+import {
+  getCompleteMission,
+  getFailMission,
+  getProgressMission,
+  getRequestMission
+} from '@/api/mission';
+
+import CategoryButton from '@/components/CategoryButton';
+import Header from '@/components/Header';
+import MissionCard from '@/components/MissionCard';
+import NavBar from '@/components/NavBar';
+import TabBar from '@/components/TabBar';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  completeMissionState,
-  progressMissionState,
-  requestMissionState,
-} from "@/store/mission";
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { useRecoilState } from "recoil";
-import styled from "styled-components";
+  SelectValue
+} from '@/components/ui/select';
+import FinishedMissionCard from '@/components/FinishedMissionCard';
 
 export default function MissionChild() {
-  const tabs = ["진행중", "완료", "요청됨"];
+  const tabs = ['진행중인 미션', '요청중인 미션', '완료된 미션'];
   const category = [
-    "전체",
-    "일상",
-    "집안일",
-    "학습",
-    "자기관리",
-    "심부름",
-    "기타",
+    '전체',
+    '일상',
+    '집안일',
+    '학습',
+    '자기관리',
+    '심부름',
+    '기타'
+  ];
+  const months = [
+    '01',
+    '02',
+    '03',
+    '04',
+    '05',
+    '06',
+    '07',
+    '08',
+    '09',
+    '10',
+    '11',
+    '12'
   ];
   const currentMonth = getCurrentMonth();
-  const previousMonths = getPreviousMonths();
 
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<number>(0);
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
-  const [selectedCategory, setSelectedCategory] = useState<string>("전체");
+  const [selectedCategory, setSelectedCategory] = useState<string>('전체');
 
   const [progressMission, setProgreesMission] =
     useRecoilState(progressMissionState);
   const [completeMission, setCompleteMission] =
     useRecoilState(completeMissionState);
+  const [failMission, setFailMission] = useRecoilState(failMissionState);
   const [requestMission, setRequestMission] =
     useRecoilState(requestMissionState);
 
+  const finishedMissions = () => {
+    const combinedMissions = [
+      ...completeMission.map((mission) => ({
+        ...mission,
+        date: mission.doneDate,
+        isCompleted: true
+      })),
+      ...failMission.map((mission) => ({
+        ...mission,
+        date: mission.failDate,
+        isCompleted: false
+      }))
+    ];
+    const sortedMissions = combinedMissions.sort((a, b) => {
+      return new Date(b.date!).getTime() - new Date(a.date!).getTime();
+    });
+
+    return sortedMissions;
+  };
+
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const tabParam = searchParams.get("tab");
+    const tabParam = searchParams.get('tab');
 
-    if (tabParam === "completed") {
+    if (tabParam === 'completed') {
       setActiveTab(1);
     }
+
+    const fetchData = async () => {
+      try {
+        const res = await login('admin_child', 'admin');
+        // console.log(res.data); // 응답 데이터 처리
+        localStorage.setItem('accessToken', res.accessToken);
+      } catch (error) {
+        console.error('Error during login:', error);
+      }
+    };
+
+    const fetchProgressMission = async () => {
+      try {
+        const res = await getProgressMission();
+        // console.log(res.data)
+        setProgreesMission(res);
+      } catch (error) {
+        throw new Error(`fetchProgressMission Error: ${error}`);
+      }
+    };
 
     const fetchRequestMission = async () => {
       try {
         const res = await getRequestMission();
         // console.log(res.data)
-        setRequestMission(res.data);
+        setRequestMission(res);
       } catch (error) {
         throw new Error(`fetchRequestMission Error: ${error}`);
       }
     };
 
+    const fetchFailMission = async () => {
+      try {
+        const res = await getFailMission();
+        // console.log(res.data)
+        setFailMission(res);
+      } catch (error) {
+        throw new Error(`fetchFailMission Error: ${error}`);
+      }
+    };
+
+    const fetchCompleteMission = async () => {
+      try {
+        const res = await getCompleteMission();
+        // console.log(res.data)
+        setCompleteMission(res);
+      } catch (error) {
+        throw new Error(`fetchCompleteMission Error: ${error}`);
+      }
+    };
+
+    fetchData();
     fetchRequestMission();
-  }, [location.search]);
-
-  // const getOngoingMissions = () => {
-  //   const now = new Date();
-  //   return progressMission.filter((mission) => new Date(mission.endDate) > now);
-  // };
-
-  // const getCompletedMissions = () => {
-  //   const now = new Date();
-  //   return completeMission.filter((mission) => new Date(mission.endDate) < now);
-  // };
+    fetchFailMission();
+    fetchCompleteMission();
+    fetchProgressMission();
+  }, [
+    location.search,
+    setCompleteMission,
+    setFailMission,
+    setProgreesMission,
+    setRequestMission
+  ]);
 
   return (
     <>
@@ -97,27 +182,30 @@ export default function MissionChild() {
               />
             ))}
           </CategorySection>
-          <MissionSection>
+          <MissionSection $activeTab={activeTab}>
             {progressMission
               .filter((mission) =>
-                selectedCategory === "전체"
+                selectedCategory === '전체'
                   ? true
                   : mission.category === selectedCategory
               )
               .map((mission, index) => (
-                <MissionCard
-                  key={index}
-                  title={mission.content}
-                  category={mission.category}
-                  deadline={mission.endDate}
-                  amount={mission.point}
-                />
+                <MissionCard key={index} {...mission} />
               ))}
           </MissionSection>
         </>
       )}
 
       {activeTab === 1 && (
+        <>
+          <MissionSection $activeTab={activeTab}>
+            {requestMission.map((mission, index) => {
+              return <MissionCard key={index} {...mission} />;
+            })}
+          </MissionSection>
+        </>
+      )}
+      {activeTab === 2 && (
         <>
           <CategorySection $activeTab={activeTab}>
             <Text>2024년</Text>
@@ -129,51 +217,23 @@ export default function MissionChild() {
                 <SelectValue></SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {previousMonths.map((month) => (
+                {months.map((month) => (
                   <SelectItem key={month} value={month}>
                     {month}월
                   </SelectItem>
                 ))}
-                <SelectItem value={currentMonth}>{currentMonth}월</SelectItem>
               </SelectContent>
             </Select>
           </CategorySection>
-          <MissionSection>
-            {completeMission
+          <MissionSection $activeTab={activeTab}>
+            {finishedMissions()
               .filter((mission) => {
-                const missionMonth = mission.doneDate.slice(5, 7);
+                const missionMonth = mission.date.slice(5, 7);
                 return missionMonth === selectedMonth;
               })
               .map((mission, index) => (
-                <MissionCard
-                  key={index}
-                  title={mission.content}
-                  category={mission.category}
-                  deadline={mission.endDate}
-                  amount={mission.point}
-                />
+                <FinishedMissionCard key={index} {...mission} />
               ))}
-          </MissionSection>
-        </>
-      )}
-
-      {activeTab === 2 && (
-        <>
-          <CategorySection $activeTab={activeTab}>
-            <Text>수락 대기중인 미션</Text>
-          </CategorySection>
-          <MissionSection>
-            {requestMission.map((mission, index) => {
-              return (
-                <MissionCard
-                  key={index}
-                  title={mission.content}
-                  category={mission.category}
-                  deadline={mission.endDate}
-                  amount={mission.point}
-                />
-              );
-            })}
           </MissionSection>
         </>
       )}
@@ -183,110 +243,28 @@ export default function MissionChild() {
 
 const getCurrentMonth = () => {
   const now = new Date();
-  return String(now.getMonth() + 1).padStart(2, "0");
+  return String(now.getMonth() + 1).padStart(2, '0');
 };
-
-const getPreviousMonths = () => {
-  const now = new Date();
-  const currentMonth = now.getMonth() + 1;
-
-  const months = [];
-
-  for (let i = 1; i < currentMonth; i++) {
-    months.push(String(i).padStart(2, "0"));
-  }
-
-  return months;
-};
-
-// const missionData = [
-//   {
-//     title: '~~사오기',
-//     category: '일상',
-//     deadline: '2024-11-21 02:00:00',
-//     amount: 1200
-//   },
-//   {
-//     title: '설거지하기',
-//     category: '집안일',
-//     deadline: '2024-11-21 02:00:00',
-//     amount: 1200
-//   },
-//   {
-//     title: '~~사오기',
-//     category: '심부름',
-//     deadline: '2024-11-21 02:00:00',
-//     amount: 1200
-//   },
-//   {
-//     title: '국어 공부하기',
-//     category: '학습',
-//     deadline: '2024-11-21 02:00:00',
-//     amount: 1200
-//   },
-//   {
-//     title: '~~사오기',
-//     category: '기타',
-//     deadline: '2024-11-21 02:00:00',
-//     amount: 1200
-//   },
-//   {
-//     title: '~~사오기',
-//     category: '자기관리',
-//     deadline: '2024-11-21 02:00:00',
-//     amount: 1200
-//   },
-//   {
-//     title: '~~사오기',
-//     category: '심부름',
-//     deadline: '2024-11-21 02:00:00',
-//     amount: 1200
-//   },
-//   {
-//     title: '~~사오기',
-//     category: '심부름',
-//     deadline: '2024-11-21 02:00:00',
-//     amount: 1200
-//   },
-//   {
-//     title: '~~사오기',
-//     category: '심부름',
-//     deadline: '2024-11-21 02:00:00',
-//     amount: 1200
-//   },
-//   {
-//     title: '~~사오기',
-//     category: '심부름',
-//     deadline: '2024-11-19 02:00:00',
-//     amount: 1200
-//   },
-//   {
-//     title: '~~사오기',
-//     category: '심부름',
-//     deadline: '2024-11-18 02:00:00',
-//     amount: 1200
-//   }
-// ];
 
 const CategorySection = styled.div<{ $activeTab: number }>`
   margin-top: 103px;
   width: 100%;
   max-width: 600px;
-  padding: ${({ $activeTab }) => ($activeTab === 1 ? "8px 20px" : "16px 20px")};
+  padding: ${({ $activeTab }) => ($activeTab === 2 ? '8px 20px' : '16px 20px')};
   overflow-x: auto;
   white-space: nowrap;
   gap: 8px;
   display: flex;
   justify-content: ${({ $activeTab }) =>
-    $activeTab === 0 ? "" : "space-between"};
+    $activeTab === 0 ? '' : 'space-between'};
   align-items: center;
   background-color: var(--white);
   position: fixed;
   z-index: 50;
 `;
 
-const MissionSection = styled.div`
-  margin-top: 160.33px;
+const MissionSection = styled.div<{ $activeTab: number }>`
+  margin-top: ${({ $activeTab }) => ($activeTab === 1 ? '120px' : '162px')};
   padding: 0 20px 90px 20px;
   display: flex;
   flex-wrap: wrap;

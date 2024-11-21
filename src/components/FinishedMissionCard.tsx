@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 
-interface CompletedMissionCardProps {
-  title: string;
+interface FinishedMissionCardProps {
+  content: string;
   category: string;
-  amount: number;
-  deadline: string;
+  point: number;
+  date: string;
   isCompleted: boolean;
 }
 
@@ -13,16 +13,16 @@ interface CategoryInfo {
   src: string;
 }
 
-const CompletedMissionCard = ({
-  title,
+const FinishedMissionCard = ({
+  content,
   category,
-  amount,
-  deadline,
+  point,
+  date,
   isCompleted
-}: CompletedMissionCardProps) => {
-  const getTimeRemaining = (deadline: string) => {
+}: FinishedMissionCardProps) => {
+  const getTimeRemaining = (finishedDate: string) => {
     const now = new Date();
-    const deadlineDate = new Date(deadline);
+    const deadlineDate = new Date(finishedDate);
 
     const timeDifference = deadlineDate.getTime() - now.getTime();
 
@@ -47,13 +47,13 @@ const CompletedMissionCard = ({
             <span>{category}</span>
           </CategoryBadge>
           <TextContainer>
-            <h1>{title}</h1>
-            <p>{getTimeRemaining(deadline)}</p>
+            <h1>{content}</h1>
+            <p>{getTimeRemaining(date)}</p>
           </TextContainer>
         </TopContainer>
         <BottomContainer>
           <img src="/icons/point.svg" alt="포인트" />
-          <p>{amount.toLocaleString()}</p>
+          <p>{point.toLocaleString()}</p>
         </BottomContainer>
       </MissionContainer>
       <ButtonFrame>
@@ -65,7 +65,7 @@ const CompletedMissionCard = ({
   );
 };
 
-export default CompletedMissionCard;
+export default FinishedMissionCard;
 
 const getCategoryInfo = (category: string): CategoryInfo => {
   switch (category) {
@@ -164,6 +164,6 @@ const Button = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 14;
+  font-size: 14px;
   font-weight: 400;
 `;

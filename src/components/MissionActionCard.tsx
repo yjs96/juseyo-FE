@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 
 interface MissionActionCardProps {
-  title: string;
+  content: string;
   category: string;
-  amount: number;
-  deadline: string;
+  point: number;
+  endDate: string;
   buttons: Array<string>;
 }
 
@@ -14,15 +14,15 @@ interface CategoryInfo {
 }
 
 const MissionActionCard = ({
-  title,
+  content,
   category,
-  amount,
-  deadline,
+  point,
+  endDate,
   buttons
 }: MissionActionCardProps) => {
-  const getTimeRemaining = (deadline: string) => {
+  const getTimeRemaining = (endDate: string) => {
     const now = new Date();
-    const deadlineDate = new Date(deadline);
+    const deadlineDate = new Date(endDate);
 
     const timeDifference = deadlineDate.getTime() - now.getTime();
 
@@ -47,13 +47,13 @@ const MissionActionCard = ({
             <span>{category}</span>
           </CategoryBadge>
           <TextContainer>
-            <h1>{title}</h1>
-            <p>{getTimeRemaining(deadline)}</p>
+            <h1>{content}</h1>
+            <p>{getTimeRemaining(endDate)}</p>
           </TextContainer>
         </TopContainer>
         <BottomContainer>
           <img src="/icons/point.svg" alt="포인트" />
-          <p>{amount.toLocaleString()}</p>
+          <p>{point.toLocaleString()}</p>
         </BottomContainer>
       </MissionContainer>
       <ButtonFrame>
@@ -167,6 +167,6 @@ const Button = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 14;
+  font-size: 14px;
   font-weight: 400;
 `;
