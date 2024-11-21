@@ -1,5 +1,13 @@
 // import React from "react";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+
+import { useRecoilState } from 'recoil';
+import { getUserInfo } from '@/api/userInfo';
+import { userInfoState } from '@/store/userInfo';
+import { completeMissionState } from '@/store/mission';
+import { getCompleteMission } from '@/api/mission';
 
 import Header from '@/components/Header';
 import MainFrame from '@/components/MainFrame';
@@ -16,44 +24,135 @@ import {
   DialogFooter,
   DialogClose
 } from '@/components/ui/dialog';
-import { useState } from 'react';
+import axiosInstance from '@/api/instance';
+
+interface MypageInfoType {
+  name: string;
+  totalPoint: number;
+  successCount: number;
+  level: string;
+}
 
 export default function MyPage() {
   const [withdrawAmount, setWithdrawAmount] = useState<string>('');
+  const [isParent, setIsParent] = useState<boolean>(false);
+  const [userInfo, setUserInfo] = useRecoilState(userInfoState);
+  const [mypageInfo, setMyPageInfo] = useState<MypageInfoType>();
+  const [completeMission, setCompleteMission] =
+    useRecoilState(completeMissionState);
 
-  const handleWithdrawChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setWithdrawAmount(e.target.value);
-  };
-
-  const userName = '임준수';
-  const userId = 'yimj57027@gmail.com';
+  const navigate = useNavigate();
 
   const kakaoSend = {
-    userName: userName,
-    parentId: userId
+    userName: userInfo.name,
+    parentId: userInfo.id,
   };
 
   const newStr: string = JSON.stringify(kakaoSend);
   const encodedInfo = btoa(encodeURIComponent(newStr));
   // decodeURIComponent(atob(인코딩된문자열))로 가입링크 받기
-  console.log(encodedInfo);
+  // console.log(encodedInfo);
 
   const shareKakao = () => {
     window.Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
-        title: `${userName}님이 초대했어요💸`,
+        title: `${userInfo.name}님이 초대했어요💸`,
         description: `작은 미션으로 시작하는 우리 아이 경제교육`,
         imageUrl: 'https://ifh.cc/g/pz0v8Z.png',
         imageWidth: 200,
         imageHeight: 100,
         link: {
-          mobileWebUrl: `http://localhost:5173/signup/${encodedInfo}`,
-          webUrl: `http://localhost:5173/signup/${encodedInfo}`
-        }
-      }
+          mobileWebUrl: `${
+            import.meta.env.VITE_FRONT_BASE
+          }/signup/${encodedInfo}`,
+          webUrl: `${import.meta.env.VITE_FRONT_BASE}/signup/${encodedInfo}`,
+        },
+      },
     });
   };
+
+  const shareAchievements = () => {
+    window.Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: `${isParent ? '자녀' : ''} ${userInfo.name}님의 미션 현황!💸`,
+        description: `${
+          completeMission.length
+        }개의 미션을 성공하고\n용돈 ${completeMission
+          .reduce((sum, mission) => sum + mission.point, 0)
+          .toLocaleString()}원을 모았어요👏\n주세요로 용돈 모아보러 갈까요?`,
+        imageUrl: 'https://ifh.cc/g/pz0v8Z.png',
+        imageWidth: 200,
+        imageHeight: 100,
+        link: {
+          mobileWebUrl: `${import.meta.env.VITE_FRONT_BASE}/`,
+          webUrl: `${import.meta.env.VITE_FRONT_BASE}/`,
+        },
+      },
+    });
+  };
+
+  const handleWithdrawChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWithdrawAmount(e.target.value);
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/login');
+  };
+
+  const handleWitdrawOrCharge = async () => {
+    if (isParent) {
+      try {
+        const res = await axiosInstance.get(
+          `/mypage/point/charge/${withdrawAmount}`
+        );
+        console.log(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        const res = await axiosInstance.get(
+          `/mypage/point/withdraw/${withdrawAmount}`
+        );
+        console.log(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getProfile();
+  };
+
+  const getProfile = async () => {
+    const res = await axiosInstance.get('/mypage/profile');
+    const data = res.data;
+    setMyPageInfo(data);
+  };
+
+  const fetchUserInfo = async () => {
+    const res = await getUserInfo();
+    if (res.type === 'parent') setIsParent(true);
+    setUserInfo(res);
+    // console.log(res);
+  };
+
+  const fetchCompleteMission = async () => {
+    try {
+      const res = await getCompleteMission();
+      // console.log(res.data);
+      setCompleteMission(res.data);
+    } catch (error) {
+      throw new Error(`fetchCompleteMission Error: ${error}`);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserInfo();
+    fetchCompleteMission();
+    getProfile();
+  }, []);
 
   return (
     <>
@@ -62,23 +161,32 @@ export default function MyPage() {
       <MainFrame $headbar $navbar $padded $bgGray>
         <ProfileFrame>
           <ImageFrame>
-            <img src="/images/card-news.jpg" alt="" />
+            <img src="/images/profile-image.jpg" alt="" />
           </ImageFrame>
           <UserInfo>
-            <div>문효만</div>
-            <span>Lv1. 똑똑한 첫걸음</span>
+            <div>{userInfo.name}</div>
+            <span>{mypageInfo?.level}</span>
           </UserInfo>
           <ButtonFrame>
             <Dialog>
               <DialogTrigger asChild>
-                <MenuButton>
-                  <i className="fa-solid fa-won-sign"></i>
-                  <span>출금</span>
-                </MenuButton>
+                {isParent ? (
+                  <MenuButton>
+                    <i className="fa-solid fa-won-sign"></i>
+                    <span>충전</span>
+                  </MenuButton>
+                ) : (
+                  <MenuButton>
+                    <i className="fa-solid fa-won-sign"></i>
+                    <span>출금</span>
+                  </MenuButton>
+                )}
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>출금신청</DialogTitle>
+                  <DialogTitle>
+                    {isParent ? '충전요청' : '출금요청'}
+                  </DialogTitle>
                   <DialogDescription>금액을 입력해주세요</DialogDescription>
                 </DialogHeader>
                 <Input
@@ -92,12 +200,17 @@ export default function MyPage() {
                     <Button className="w-full" variant={'destructive'}>
                       취소
                     </Button>
-                    <Button className="w-full">확인</Button>
+                    <Button
+                      onClick={() => handleWitdrawOrCharge()}
+                      className="w-full"
+                    >
+                      확인
+                    </Button>
                   </DialogClose>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            <MenuButton>
+            <MenuButton onClick={() => shareAchievements()}>
               <i className="fa-regular fa-share-from-square"></i>
               <span>공유</span>
             </MenuButton>
@@ -114,29 +227,40 @@ export default function MyPage() {
         <MenuFrame>
           <MenuDesc>정보</MenuDesc>
           <Menu>
-            <div>적립 용돈</div>
-            <div>12,000원</div>
+            <div>이번달 용돈</div>
+            <div>{mypageInfo?.totalPoint.toLocaleString()}원</div>
+          </Menu>
+          <Menu>
+            <div>누적 용돈</div>
+            <div>
+              {completeMission
+                .reduce((sum, mission) => sum + mission.point, 0)
+                .toLocaleString()}
+              원
+            </div>
           </Menu>
           <Menu>
             <div>완료한 미션</div>
-            <div>20개</div>
+            <div>{completeMission.length}개</div>
           </Menu>
           <Menu>
             <div>계좌 번호</div>
-            <div>429502-01-316389</div>
+            <div>{userInfo.accountNum}</div>
           </Menu>
         </MenuFrame>
         <MenuFrame>
           <MenuDesc>계정</MenuDesc>
           <Menu onClick={() => shareKakao()}>
-            <div>연동하기</div>
+            <div>연동하기(해야됨)</div>
           </Menu>
           <Menu>
             <div>부모님 아이디</div>
-            <div>문준일</div>
+            <div>문준일(해야됨)</div>
           </Menu>
           <Menu>
-            <div className="text-[var(--red)]">로그아웃</div>
+            <div className="text-[var(--red)]" onClick={() => handleLogout()}>
+              로그아웃
+            </div>
           </Menu>
         </MenuFrame>
       </MainFrame>
@@ -166,6 +290,7 @@ const ImageFrame = styled.div`
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transform: scale(1.2);
   }
 `;
 

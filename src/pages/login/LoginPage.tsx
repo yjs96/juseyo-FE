@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 
 export default function LoginPage() {
+  localStorage.clear();
+
   const kakaoLoginRequestCodeHandler = async () => {
     window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${
       import.meta.env.VITE_KAKAO_REST_API_KEY
